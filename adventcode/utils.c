@@ -8,10 +8,8 @@ int loader(const char *filename, char ***linesOut)
     if (!file)
     {
         perror("failed to open file");
-        return EXIT_FAILURE;
+        return -1;
     }
-
-    printf("file opened\n");
 
     size_t count = 0;
     // initial capacity
@@ -22,7 +20,7 @@ int loader(const char *filename, char ***linesOut)
     {
         fclose(file);
         perror("Failed to allocate memory for lines");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     char *line = NULL;
@@ -75,25 +73,9 @@ void freeTextData(char **lines, int count)
     free(lines);
 }
 
-int main()
-{
-    char **lines = NULL;
-    int count = loader("1.txt", &lines);
-
-    if (count < 0)
-    {
-        perror("failed to load file");
-        return EXIT_FAILURE;
+int absolute(int a){
+    if(a < 0){
+        return a * -1;
     }
-
-    printf("Loaded %d lines:\n", count);
-
-    for (int i = 0; i < count; i++)
-    {
-        printf("Line %d: %s\n", i + 1, lines[i]);
-    }
-
-    freeTextData(lines, count);
-
-    return 0;
+    return a;
 }

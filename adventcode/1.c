@@ -3,70 +3,76 @@
 #include <string.h>
 #include "utils.c"
 
-struct line
+void buble_sort(int count, int *input)
 {
-    int value;
-    int *prev;
-    int *next;
-};
+    for (int i = 0; i < count; i++)
+    {
+        for (int j = 0; j < i; j++)
+        {
+
+            if (input[j] > input[i])
+            {
+                int temp = input[j];
+                input[j] = input[i];
+                input[i] = temp;
+            }
+        }
+    }
+}
+
+int solve(int totalLine, char **lines)
+{
+    int *left = (int *)malloc(totalLine);
+    int *right = (int *)malloc(totalLine);
+
+    // read input
+    for (int i = 0; i < totalLine; i++)
+    {
+        if (sscanf(lines[i], "%d\t%d", &left[i], &right[i]) != 2)
+        {
+            return EXIT_FAILURE;
+        }
+    }
+
+    buble_sort(totalLine, left);
+    buble_sort(totalLine, right);
+
+    int sum = 0;
+
+    for (int i = 0; i < totalLine; i++)
+    {
+        int distance = absolute(left[i] - right[i]);
+        printf("%d - %d = %d\n", left[i], right[i], distance);
+        sum += distance;
+    }
+
+    printf("%d\n", sum);
+
+    return EXIT_SUCCESS;
+}
 
 int main()
 {
-    FILE *file;
-    int ch;
-    char *content = NULL; // Pointer to store the file content
-    size_t size = 0;      // Current size of the content
-    size_t capacity = 1;  // Initial capacity
+    char **lines = NULL;
+    int count = loader("1.txt", &lines);
 
-    // Open the file in read mode
-    file = fopen("1.txt", "r");
-    if (file == NULL)
+    if (count < 0)
     {
-        perror("Error opening file");
+        perror("failed to load file");
         return EXIT_FAILURE;
     }
 
-    // Allocate initial memory
-    content = (char *)malloc(capacity);
-    if (content == NULL)
+    int result = solve(count, lines);
+
+    if (result > 0)
     {
-        perror("Memory allocation failed");
-        fclose(file);
-        return EXIT_FAILURE;
+        perror("failed to solve problem");
+        return 0;
     }
 
-    // Read file character by character
-    while ((ch = fgetc(file)) != EOF)
-    {
-        if (size + 1 >= capacity)
-        {
-            // Double the capacity when needed
-            capacity *= 2;
-            char *new_content = (char *)realloc(content, capacity);
-            if (new_content == NULL)
-            {
-                perror("Memory reallocation failed");
-                free(content);
-                fclose(file);
-                return EXIT_FAILURE;
-            }
-            content = new_content;
-        }
+    // printf("success solve the problem\n");
 
-        content[size++] = (char)ch; // Store the character
-    }
+    freeTextData(lines, count);
 
-    // Null-terminate the string
-    content[size] = '\0';
-
-    // Close the file
-    fclose(file);
-
-    // Use the content (Here, we simply print it for verification)
-    printf("File Content:\n%s", content);
-
-    // Free allocated memory
-    free(content);
-
-    return EXIT_SUCCESS;
+    return 0;
 }
